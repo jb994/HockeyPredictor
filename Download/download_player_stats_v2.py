@@ -15,7 +15,7 @@ def main(team1):
 
 	### Opens the roster file for each team and checks that it exists.
 	try:
-		team1_file=open("team_rosters/%s" % (team1), 'r')
+		team1_file=open("../team_rosters/%s" % (team1), 'r')
 	except:
 		print("Roster file for team %s could not be found: Aborting" % (team1))
 		quit()
@@ -25,7 +25,7 @@ def main(team1):
 	req = Request(url_for_team_stats, headers={'User-Agent': 'Mozilla/5.0'})
 	webPage=urllib.request.urlopen(req)
 	webContent=webPage.read().decode()
-	new_team_file=open("team_stats/" + team1 + '.csv', 'w+')
+	new_team_file=open("../team_stats/" + team1 + '.csv', 'w+')
 	new_team_file.write(webContent)
 	new_team_file.close()
 
@@ -61,7 +61,7 @@ def downloadPlayerStats(player, isGoalie=False):
 		url_prefix="http://moneypuck.com/moneypuck/playerData/careers/gameByGame/regular/skaters/" #player_id.csv
 	else:
 		url_prefix="http://moneypuck.com/moneypuck/playerData/careers/gameByGame/regular/goalies/" #goalie_id.csv
-	player_file=open("g2g_stats_moneypuck/" + player + '.csv', 'r')
+	player_file=open("../g2g_stats_moneypuck/" + player + '.csv', 'r')
 	player_id=((player_file.readlines())[1].split(','))[0]
 
 	url=url_prefix+player_id+'.csv'
@@ -73,7 +73,7 @@ def downloadPlayerStats(player, isGoalie=False):
 	webContent=webPage.read().decode()
 
 	### Write the player's stats to a file on my computer
-	new_player_file=open("g2g_stats_moneypuck/" + player + '.csv', 'w+')
+	new_player_file=open("../g2g_stats_moneypuck/" + player + '.csv', 'w+')
 	new_player_file.write(webContent)
 	new_player_file.close()
 	print("Stats for player %s downloaded" % (player))

@@ -13,12 +13,12 @@ def main():
 
 	### Opens the roster file for each team and checks that it exists.
 	try:
-		team1_file=open("team_rosters/%s" % (team1), 'r')
+		team1_file=open("../team_rosters/%s" % (team1), 'r')
 	except:
 		print("Roster file for team %s could not be found: Aborting" % (team1))
 		quit()
 	try:
-		team2_file=open("team_rosters/%s" % (team2), 'r')
+		team2_file=open("../team_rosters/%s" % (team2), 'r')
 	except:
 		print("Roster file for team %s could not be found: Aborting" % (team2))
 		quit()
@@ -34,7 +34,7 @@ def main():
 			player=player_list[index].replace("\n",'')
 			try:
 				#print("g2g_stats_moneypuck/" + player + '.csv')
-				player_file=open("g2g_stats_moneypuck/" + player + '.csv', 'r')
+				player_file=open("../g2g_stats_moneypuck/" + player + '.csv', 'r')
 				player_id=((player_file.readlines())[1].split(','))[0]
 				url=url_prefix+player_id+'.csv'
 				player_file.close()
@@ -43,7 +43,7 @@ def main():
 				webPage=urllib.request.urlopen(url)
 				webContent=webPage.read().decode()
 				### Write the player's stats to a file on my computer
-				new_player_file=open("g2g_stats_moneypuck/" + player + '.csv', 'w+')
+				new_player_file=open("../g2g_stats_moneypuck/" + player + '.csv', 'w+')
 				new_player_file.write(webContent)
 				new_player_file.close()
 				print("Stats for player %s downloaded" % (player))
@@ -56,7 +56,7 @@ def main():
 		### This will get the goalie stats if he is in the roster file
 		goalie=player_list[18].replace("\n",'')
 		try:
-			player_file=open("g2g_stats_moneypuck/" + goalie + '.csv', 'r')
+			player_file=open("../g2g_stats_moneypuck/" + goalie + '.csv', 'r')
 			player_id=((player_file.readlines())[1].split(','))[0]
 			url=goalie_url_prefix+player_id+'.csv'
 			player_file.close()
@@ -64,7 +64,7 @@ def main():
 			webPage=urllib.request.urlopen(url)
 			webContent=webPage.read().decode()
 			### Write the goalie stats into a file on my computer
-			new_goalie_file=open('g2g_stats_moneypuck/' + goalie + '.csv', 'w+')
+			new_goalie_file=open('../g2g_stats_moneypuck/' + goalie + '.csv', 'w+')
 			new_goalie_file.write(webContent)
 			new_goalie_file.close()
 			print("Stats for goalie %s downloaded" % (goalie))
