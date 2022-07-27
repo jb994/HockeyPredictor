@@ -14,6 +14,7 @@ import pandas as pd
 import numpy as np
 from sklearn.linear_model import LinearRegression
 from datetime import datetime
+from datetime import date as getDate
 
 debug=False
 printIndividualStats=True # Prints the individual predicted stats for each player
@@ -21,7 +22,7 @@ calculatePenalties=False # Unavailable
 doGoalieAnalysis=False # Will perform an additional goalie stat analysis at the end
 allowPastAnalysis=True # Let's the user put in game's from a past date, assuming the correct roster is used
 
-def main(homeTeam, awayTeam, date, season, doRefAnalysis=False):
+def gameCalculation(homeTeam, awayTeam, date, season, doRefAnalysis=False):
 	### A multiple variable linear regression software used to predict the outcomes of hockey games
 	
 
@@ -30,12 +31,12 @@ def main(homeTeam, awayTeam, date, season, doRefAnalysis=False):
 	#################################################################
 	# [['ANA','ARI','BOS','BUF','CAR','CBJ','CGY','CHI','COL','DAL','DET','EDM','FLA','L.A','MIN','MTL','N.J','NSH','NYI','NYR','OTT','PHI','PIT','S.J','STL','T.B','TOR','VAN','VGK','WPG','WSH']]
 	gameDay=str(date)
-	dayOfWeek=datetime.date(gameDay[0:4], gameDay[4:6], gameDay[6:8]).weekday()
+	dayOfWeek=getDate(int(gameDay[0:4]), int(gameDay[4:6]), int(gameDay[6:8])).strftime("%A")
 	#dayOfWeek='Sunday' # [["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]]
 	if doRefAnalysis:
 		ref1='name' #First ref's name
 		ref2='name' #Second ref's name
-		refFile=open("../ref_%s_stats.csv" % (season))
+		refFile=open("ref_%s_stats.csv" % (season))
 	else:
 		refFile=None
 
@@ -61,8 +62,8 @@ def team_analysis_w_moneypuck(gameInfo):
 	### This function predicts how many goals each team is supposed to score and let in by \
 	### using regression analysis to determine how many high, medium, and low scoring chances\
 	### each player will get and how many they will capitalize on.
-	homeTeamRosterFile=open("../team_rosters/%s" % (gameInfo['homeTeam']))
-	awayTeamRosterFile=open("../team_rosters/%s" % (gameInfo['awayTeam']))
+	homeTeamRosterFile=open("team_rosters/%s" % (gameInfo['homeTeam']))
+	awayTeamRosterFile=open("team_rosters/%s" % (gameInfo['awayTeam']))
 
 	### Initializes all the variables used to record predicted stats
 	homeTeamxPEN=0
@@ -162,10 +163,10 @@ def team_analysis_w_moneypuck(gameInfo):
 		else:
 			homeGoalie=homeTeamRoster[18].replace("\n",'')
 			awayGoalie=awayTeamRoster[18].replace("\n",'')
-			if os.path.isfile(('../g2g_stats_moneypuck/%s.csv') % homeGoalie):
+			if os.path.isfile(('g2g_stats_moneypuck/%s.csv') % homeGoalie):
 				goalieAnalysis()
 
-				homeGoalieStats=pd.read_csv("../g2g_stats_moneypuck/%s.csv" % (homeGoalie))
+				homeGoalieStats=pd.read_csv("g2g_stats_moneypuck/%s.csv" % (homeGoalie))
 				homeGoalieStats=clean_df(homeGoalieStats, "HOME", gameInfo)
 				homeGoalieStats=homeGoalieStats.drop(homeGoalieStats[homeGoalieStats.situation!="all"].index)
 				homeGoalieStats=homeGoalieStats.drop(homeGoalieStats[homeGoalieStats.season<gameInfo['season']-2].index)
@@ -206,8 +207,8 @@ def team_analysis_w_moneypuck(gameInfo):
 			else:
 				print("No stats for goalie %s, goalie calculations cannot be made" % homeGoalie)
 
-			if os.path.isfile(('../g2g_stats_moneypuck/%s.csv') % awayGoalie):
-				awayGoalieStats=pd.read_csv("../g2g_stats_moneypuck/%s.csv" % (awayGoalie))
+			if os.path.isfile(('g2g_stats_moneypuck/%s.csv') % awayGoalie):
+				awayGoalieStats=pd.read_csv("g2g_stats_moneypuck/%s.csv" % (awayGoalie))
 				awayGoalieStats=clean_df(awayGoalieStats, "AWAY", gameInfo)
 				awayGoalieStats=awayGoalieStats.drop(awayGoalieStats[awayGoalieStats.situation!="all"].index)
 				awayGoalieStats=awayGoalieStats.drop(awayGoalieStats[awayGoalieStats.season<gameInfo['season']-2].index)
@@ -231,7 +232,7 @@ def playerScoringAnalysisMoneypuck(player, homeOrAway, gameInfo):
 		opp=gameInfo['homeTeam']
 
 	try:
-		stats=pd.read_csv("../g2g_stats_moneypuck/%s.csv" % (player))
+		stats=pd.read_csv("g2g_stats_moneypuck/%s.csv" % (player))
 	except:
 		print("No stats for player %s, prediction cannot be made: Aborting" % player)
 		quit()
@@ -268,7 +269,7 @@ def playerScoringAnalysisMoneypuck(player, homeOrAway, gameInfo):
 	if printIndividualStats==True:
 		print("Expected PP Goals For = %s" % (xPPGF))
 		print("Expected SH Goals Against = %s" % (xSHGA))
-	xSHList = shotMetricCalculations(stats_4on5, opp, homeOrAway, gameInfo)
+	xSHList = shotMetricCalculations(stats4on5, opp, homeOrAway, gameInfo)
 	xSHGF=xSHList[0]
 	xPPGA=xSHList[1]
 	if printIndividualStats==True:
@@ -307,6 +308,8 @@ def shotMetricCalculations(df, opp, homeOrAway, gameInfo):
 
 	### Get the value for how many days its been since the prior game
 	daysSinceLastGame=str(gameInfo['date']-int(df.iloc[[-1]]["gameDate"]))
+	if int(daysSinceLastGame)>7:
+		daysSinceLastGame='7'
 
 	### Creates the prediction system for each type of shot
 	mlrHighDangerFor.fit(df[[opp, homeOrAway, 'icetime', gameInfo['dayOfWeek'], "daysSinceLastGame_"+daysSinceLastGame]], df['OnIce_F_highDangerShots'])
@@ -382,9 +385,9 @@ def clean_df(df, homeOrAway, gameInfo):
 	
 
 	#newDF = pd.get_dummies(newDF, columns=['homeOrAway', 'opposingTeam', 'dayOfWeek'], prefix='', prefix_sep='')
-	newDF=pd.get_dummies(newDF, columns=['homeOrAway'], prefix='', prefix_sep='')
-	newDF=pd.get_dummies(newDF, columns=['opposingTeam'], prefix='', prefix_sep='')
-	newDF=pd.get_dummies(newDF, columns=['dayOfWeek'], prefix='', prefix_sep='')
+	newDF=pd.get_dummies(newDF, columns=['home_or_away', 'opposingTeam', 'dayOfWeek'], prefix='', prefix_sep='')
+	#newDF=pd.get_dummies(newDF, columns=['opposingTeam'], prefix='', prefix_sep='')
+	#newDF=pd.get_dummies(newDF, columns=['dayOfWeek'], prefix='', prefix_sep='')
 
 	if allowPastAnalysis:
 		newDF.drop(newDF[newDF.gameDate>=gameInfo['date']].index, inplace=True)
@@ -403,8 +406,8 @@ def clean_df(df, homeOrAway, gameInfo):
 	if (int(daysSinceLastGame)<1):
 		print("Incorrect input for game date: Aborting")
 		quit()
-	if "days_since_last_game_"+daysSinceLastGame not in newDF.columns:
-		newDF["days_since_last_game_"+daysSinceLastGame]=np.zeros(newDF.shape[0], dtype=int)
+	if "daysSinceLastGame_"+daysSinceLastGame not in newDF.columns:
+		newDF["daysSinceLastGame_"+daysSinceLastGame]=np.zeros(newDF.shape[0], dtype=int)
 
 	return newDF
 
@@ -415,7 +418,7 @@ def doPenaltyAnalysis(homeTeamRoster, awayTeamRoster, gameInfo):
 		player=homeTeamRoster[index].replace("\n",'')
 		playerPenalties=LinearRegression()
 		try:
-			stats=pd.read_csv("../g2g_stats_moneypuck/%s.csv" % (player))
+			stats=pd.read_csv("g2g_stats_moneypuck/%s.csv" % (player))
 		except:
 			print("No stats for player %s, prediction cannot be made: Aborting" % player)
 			quit()
@@ -428,7 +431,7 @@ def doPenaltyAnalysis(homeTeamRoster, awayTeamRoster, gameInfo):
 		player=awayTeamRoster[index].replace("\n",'')
 		playerPenalties=LinearRegression()
 		try:
-			stats=pd.read_csv("../g2g_stats_moneypuck/%s.csv" % (player))
+			stats=pd.read_csv("g2g_stats_moneypuck/%s.csv" % (player))
 		except:
 			print("No stats for player %s, prediction cannot be made: Aborting" % player)
 			quit()
@@ -441,7 +444,7 @@ def doPenaltyAnalysis(homeTeamRoster, awayTeamRoster, gameInfo):
 
 
 def calcxPenalties(stats, homeOrAway, gameInfo):
-	if homeOrAway="HOME":
+	if homeOrAway=="HOME":
 		opp=gameInfo['awayTeam']
 		oppTeam='awayTeam'
 	else:
@@ -496,23 +499,6 @@ def player_PP_analysis_moneypuck(df, Home_or_Away, Day_of_week, todays_date, Opp
 
 
 
-
-
-
-
-def goalie_scoring_analysis_moneypuck():
-	None
-
-
-def player_even_strength_analysis_moneypuck():
-	None
-
-def player_PK_analysis_moneypuck():
-	None
-	
-
-
-
 def countDaysBetweenGamesMoneypuck(datesList):
 	# This Function calculates and records the number of days since the last game
 	# If the number is greater than 6, then it is recorded as 7
@@ -534,7 +520,6 @@ def countDaysBetweenGamesMoneypuck(datesList):
 				daysBetweenGamesList.append(numberOfDaysSinceLastGame)
 			elif numberOfDaysSinceLastGame>7:
 				daysBetweenGamesList.append(7)
-			#days_between_games_list.append(number_of_days_since_last_game)
 			if daysBetweenGamesList[-1]<0:
 				print("Note: error in dataset. There are repeated games in player's stats")
 				print(daysBetweenGamesList)
@@ -545,8 +530,18 @@ def countDaysBetweenGamesMoneypuck(datesList):
 	return daysBetweenGamesList
 
 
+def goalie_scoring_analysis_moneypuck():
+	None
+
+
+def player_even_strength_analysis_moneypuck():
+	None
+
+def player_PK_analysis_moneypuck():
+	None
+	
 
 
 
 
-main()
+#gameCalculation('EDM', 'COL', 20220411, 2021, doRefAnalysis=False)
