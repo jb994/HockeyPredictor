@@ -163,10 +163,10 @@ def team_analysis_w_moneypuck(gameInfo):
 		else:
 			homeGoalie=homeTeamRoster[18].replace("\n",'')
 			awayGoalie=awayTeamRoster[18].replace("\n",'')
-			if os.path.isfile(('g2g_stats_moneypuck/%s.csv') % homeGoalie):
+			if os.path.isfile(('moneypuckPlayerStats/%s.csv') % homeGoalie):
 				goalieAnalysis()
 
-				homeGoalieStats=pd.read_csv("g2g_stats_moneypuck/%s.csv" % (homeGoalie))
+				homeGoalieStats=pd.read_csv("moneypuckPlayerStats/%s.csv" % (homeGoalie))
 				homeGoalieStats=clean_df(homeGoalieStats, "HOME", gameInfo)
 				homeGoalieStats=homeGoalieStats.drop(homeGoalieStats[homeGoalieStats.situation!="all"].index)
 				homeGoalieStats=homeGoalieStats.drop(homeGoalieStats[homeGoalieStats.season<gameInfo['season']-2].index)
@@ -207,8 +207,8 @@ def team_analysis_w_moneypuck(gameInfo):
 			else:
 				print("No stats for goalie %s, goalie calculations cannot be made" % homeGoalie)
 
-			if os.path.isfile(('g2g_stats_moneypuck/%s.csv') % awayGoalie):
-				awayGoalieStats=pd.read_csv("g2g_stats_moneypuck/%s.csv" % (awayGoalie))
+			if os.path.isfile(('moneypuckPlayerStats/%s.csv') % awayGoalie):
+				awayGoalieStats=pd.read_csv("moneypuckPlayerStats/%s.csv" % (awayGoalie))
 				awayGoalieStats=clean_df(awayGoalieStats, "AWAY", gameInfo)
 				awayGoalieStats=awayGoalieStats.drop(awayGoalieStats[awayGoalieStats.situation!="all"].index)
 				awayGoalieStats=awayGoalieStats.drop(awayGoalieStats[awayGoalieStats.season<gameInfo['season']-2].index)
@@ -232,7 +232,7 @@ def playerScoringAnalysisMoneypuck(player, homeOrAway, gameInfo):
 		opp=gameInfo['homeTeam']
 
 	try:
-		stats=pd.read_csv("g2g_stats_moneypuck/%s.csv" % (player))
+		stats=pd.read_csv("moneypuckPlayerStats/%s.csv" % (player))
 	except:
 		print("No stats for player %s, prediction cannot be made: Aborting" % player)
 		quit()
@@ -288,7 +288,6 @@ def playerScoringAnalysisMoneypuck(player, homeOrAway, gameInfo):
 
 
 def shotMetricCalculations(df, opp, homeOrAway, gameInfo):
-
 
 	if homeOrAway=='HOME':
 		opp=gameInfo['awayTeam']
@@ -357,12 +356,8 @@ def shotMetricCalculations(df, opp, homeOrAway, gameInfo):
 	xLDA = mlrLowDangerAgainst.intercept_ + oppCoef*mlrLowDangerAgainst.coef_[0] + H_A_coef*mlrLowDangerAgainst.coef_[1] + avgTOI*mlrLowDangerAgainst.coef_[2] + DOW_coef*mlrLowDangerAgainst.coef_[3] + mlrLowDangerAgainst.coef_[4]
 	
 	### This part calculates how many goals for and against the player will be on for
-	#print("xGF= %s*%s + %s*%s + %s*%s" % (xHDF, high_danger_for_efficiency, xMDF, medium_danger_for_efficiency, xLDF, low_danger_for_efficiency))
 	xGF= xHDF*highDangerForEfficiency + xMDF*mediumDangerForEfficiency + xLDF*lowDangerForEfficiency
 	xGA= xHDA*highDangerAgainstEfficiency + xMDA*mediumDangerAgainstEfficiency + xLDA*lowDangerAgainstEfficiency
-	
-	### Uncomment to print the specific expected goals for and against for this player
-	#print(player)
 
 	returnList = [xGF, xGA, xHDA, xMDA, xLDA]
 	xGF, xGA
@@ -418,7 +413,7 @@ def doPenaltyAnalysis(homeTeamRoster, awayTeamRoster, gameInfo):
 		player=homeTeamRoster[index].replace("\n",'')
 		playerPenalties=LinearRegression()
 		try:
-			stats=pd.read_csv("g2g_stats_moneypuck/%s.csv" % (player))
+			stats=pd.read_csv("moneypuckPlayerStats/%s.csv" % (player))
 		except:
 			print("No stats for player %s, prediction cannot be made: Aborting" % player)
 			quit()
@@ -431,7 +426,7 @@ def doPenaltyAnalysis(homeTeamRoster, awayTeamRoster, gameInfo):
 		player=awayTeamRoster[index].replace("\n",'')
 		playerPenalties=LinearRegression()
 		try:
-			stats=pd.read_csv("g2g_stats_moneypuck/%s.csv" % (player))
+			stats=pd.read_csv("moneypuckPlayerStats/%s.csv" % (player))
 		except:
 			print("No stats for player %s, prediction cannot be made: Aborting" % player)
 			quit()

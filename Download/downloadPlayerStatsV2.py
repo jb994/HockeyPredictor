@@ -61,7 +61,7 @@ def downloadPlayerStats(player, isGoalie=False):
 		urlPrefix="http://moneypuck.com/moneypuck/playerData/careers/gameByGame/regular/skaters/" #player_id.csv
 	else:
 		urlPrefix="http://moneypuck.com/moneypuck/playerData/careers/gameByGame/regular/goalies/" #goalie_id.csv
-	playerFile=open("g2g_stats_moneypuck/" + player + '.csv', 'r')
+	playerFile=open("moneypuckPlayerStats/" + player + '.csv', 'r')
 	playerID=((playerFile.readlines())[1].split(','))[0]
 
 	url=urlPrefix+playerID+'.csv'
@@ -73,7 +73,7 @@ def downloadPlayerStats(player, isGoalie=False):
 	webContent=webPage.read().decode()
 
 	### Write the player's stats to a file on my computer
-	newPlayerFile=open("g2g_stats_moneypuck/" + player + '.csv', 'w+')
+	newPlayerFile=open("moneypuckPlayerStats/" + player + '.csv', 'w+')
 	newPlayerFile.write(webContent)
 	newPlayerFile.close()
 	print("Stats for player %s downloaded" % (player))

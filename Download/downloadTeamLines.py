@@ -190,13 +190,13 @@ def whoToAddToRoster(finalPlayerList, newPlayerList, oldPlayerList, playerPositi
 	print(finalPlayerList)
 	for player in newPlayerList:
 		if player in oldPlayerList:
-			if os.path.isfile(('g2g_stats_moneypuck/%s.csv') % player):
+			if os.path.isfile(('moneypuckPlayerStats/%s.csv') % player):
 				print('old: ' + player + ' (' + playerPositionDict[player] + ')')
 			else:
 				print('old: ' + player + ' (' + playerPositionDict[player] + '), (File not Found)')
 		else:
-			if os.path.isfile(('g2g_stats_moneypuck/%s.csv') % player):
-				if len(open('g2g_stats_moneypuck/%s.csv' % player).readlines()) < minGamesThreshold*5-1:
+			if os.path.isfile(('moneypuckPlayerStats/%s.csv') % player):
+				if len(open('moneypuckPlayerStats/%s.csv' % player).readlines()) < minGamesThreshold*5-1:
 					print('new: ' + player + ' (' + playerPositionDict[player] + '), (Under 20 GP)')
 				else:
 					print('new: ' + player + ' (' + playerPositionDict[player] + ')')
@@ -223,13 +223,13 @@ def addGoalieToRoster(newGoalie, oldGoalie):
 	if (oldGoalie != newGoalie) and (oldGoalie is not None):
 		goalieSelected=False
 		while goalieSelected==False:
-			if os.path.isfile(('g2g_stats_moneypuck/%s.csv') % oldGoalie):
+			if os.path.isfile(('moneypuckPlayerStats/%s.csv') % oldGoalie):
 				print('old: ' + oldGoalie + ' (G)')
 
 			else:
 				print('old: ' + oldGoalie + ' (G), (File not Found)')
 
-			if os.path.isfile(('g2g_stats_moneypuck/%s.csv') % newGoalie):
+			if os.path.isfile(('moneypuckPlayerStats/%s.csv') % newGoalie):
 				print('new: ' + newGoalie + ' (G)')
 
 			else:

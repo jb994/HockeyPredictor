@@ -8,10 +8,11 @@ import os.path
 def main():
 	### Open the webpage with the catalogue of all players
 	url_prefix="http://moneypuck.com/moneypuck/playerData/careers/gameByGame/regular/skaters/" #player_id.csv
-	webPage=urllib.request.urlopen(url_prefix)
+
+	req = Request(url_prefix, headers={'User-Agent': 'Mozilla/5.0'})
+	webPage=urllib.request.urlopen(req)
 	directoryContent=webPage.read().decode()
 	directoryContent=directoryContent.split("\n")
-#	print(directoryContent)
 
 	number_of_players=0
 	line_number=0

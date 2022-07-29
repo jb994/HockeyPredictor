@@ -1,0 +1,13 @@
+HockeyPredictor
+
+HockeyPredictor is a collection of python softwares used for predicting the outcome of NHL hockey games.
+Given the rosters and game-to-game stats of individual players, this pipeline predicts the expected low-quality, medium-quality, and high-quality shot attempts a player will have for and against while he is on the ice and predicts with what efficiency this shot attempts will result in actual goals by using a linear regression model to take into account each player's tendencies for performance regarding the opposing team they're playing, the number of rest days prior to the game, day of the week, expected time on ice, as well as a few more factors. Calculating the expecgted number of goals for and against that each individual player will be on the ice for a cumulative team score can be made and a prediction of which team has the higher chance of winning can be made.
+
+For simplest usage run
+python predictGame.py [homeTeam] [awayTeam] [--date DATE] [--season SEASON]
+	- homeTeam is the 3-letter code of the home team (Using Moneypuck.com data formats)
+	- awayTeam is the 3-letter code of the away team (Using Moneypuck.com data formats)
+	- DATE is a 8 digit number in the form YYYYMMDD of the game
+	- SEASON is a 4 digit number indicating the year the season began YYYY. For example a game on April 4th 2022 in the 2021-2022 season would need the SEASON argument to be 2021.
+
+This function will get the current lines for the team from Moneypuck.com, update the player stats (files for the player stats must first be downloaded onto the computer), and then the expected goals for and against for the home and away teams are then calculated.
