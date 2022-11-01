@@ -2,6 +2,8 @@
 
 
 import urllib.request, urllib.parse, urllib.error
+from urllib.request import build_opener, HTTPCookieProcessor
+from http.cookiejar import CookieJar
 import os.path
 from Download.downloadPlayerStatsV2 import downloadTeamStats
 
@@ -60,7 +62,11 @@ def downloadRoster(team):
 		'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
 	}
 	req=urllib.request.Request(urlForLines, headers=header)
-	webPage=urllib.request.urlopen(req)
+	cj = CookieJar()
+	opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))
+
+	#webPage=urllib.request.urlopen(req)
+	webPage=opener.open(req)
 	webContent=webPage.read().decode()
 	webContentSplit=webContent.split('\n')
 
